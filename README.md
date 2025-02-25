@@ -56,6 +56,12 @@ The Dynamic Image-Based Authentication (DYGA) System is a secure, user-friendly 
 - **Prototype Limitation**: Data is stored in session storage, which is temporary and client-side. For production, use server-side storage with secure database encryption.
 - **Keyword**: The keyword enhances personalization but should be treated as a secret in a real system, as it influences grid generation.
 - **Hashing**: SHA-256 is used for simplicity; consider salted hashing (e.g., PBKDF2) for production.
+## Screenshots
+
+![Screenshot 2025-02-25 101547](https://github.com/user-attachments/assets/c4074f7c-04e1-47be-8e41-c6b3142bb8f6)![Screenshot 2025-02-25 101647](https://github.com/user-attachments/assets/2be5519c-5a63-413e-951a-4d280e80a5e2)
+
+![Screenshot 2025-02-25 101517](https://github.com/user-attachments/assets/1a5fbede-6379-4b6f-8d50-81932bb7aa8a)
+![Screenshot 2025-02-25 101502](https://github.com/user-attachments/assets/d1198078-0925-43cd-a28c-46854d208aea)
 
 ## Customization
 - **Image Source**: Replace Robohash URLs with custom image sets by modifying the `src` attribute in `generateGrid()`.
