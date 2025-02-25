@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - DYGA System</title>
+  <style>
+    body {
+      background-color: #333;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    #login-container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #555;
+      border-radius: 5px;
+      background: #444;
+      color: #fff;
+    }
+    button {
+      padding: 10px 20px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .grid-item {
+      position: relative;
+      border: 1px solid #555;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .grid-item img {
+      width: 100%;
+      height: auto;
+      display: block;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .grid-item img:hover {
+      transform: scale(1.05);
+    }
+    .watermark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      font-size: 16px;
+    }
+    #message {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    #message.success {
+      background: #4CAF50;
+    }
+    #message.error {
+      background: #F44336;
+    }
+  </style>
+</head>
+<body>
+  <div id="login-container">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="text" id="keyword" placeholder="Keyword" required>
+    <button id="login-button">Login</button>
+    <div id="grid-container" style="display: none;"></div>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const imagePool = Array.from({ length: 16 }, (_, i) => String(i + 1)); // '1' to '16'
+    let selectedImages = [];
+    let currentGrid = 0;
+    const totalGrids = 3;
+    let currentKeyword = '';
+
+    // Utility: Shuffle array
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Generate a grid based on keyword
+    function generateGrid(keyword) {
+      currentKeyword = keyword;
+      const gridImages = shuffle(imagePool.slice());
+      let gridHtml = '<div class="grid">';
+      gridImages.forEach(img => {
+        gridHtml += `
+          <div class="grid-item">
+            <img src="https://robohash.org/${keyword}${img}.png" data-id="${img}" tabindex="0" alt="Image ${img}">
+            <div class="watermark">${img}</div>
+          </div>`;
+      });
+      gridHtml += '</div>';
+      document.getElementById('grid-container').innerHTML = gridHtml;
+
+      // Event listeners for image selection
+      document.querySelectorAll('.grid img').forEach(img => {
+        img.addEventListener('click', () => selectImage(img.dataset.id));
+        img.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') selectImage(img.dataset.id);
+        });
+      });
+    }
+
+    // Handle image selection
+    function selectImage(id) {
+      selectedImages.push(id);
+      currentGrid++;
+      if (currentGrid < totalGrids) {
+        generateGrid(currentKeyword);
+      } else {
+        verifySequence();
+      }
+    }
+
+    // Verify the selected sequence
+    async function verifySequence() {
+      const sequenceString = selectedImages.join(',');
+      const sequenceHash = await hashSequence(sequenceString);
+      const storedSequenceHash = sessionStorage.getItem('sequenceHash');
+      const messageEl = document.getElementById('message');
+
+      if (sequenceHash === storedSequenceHash) {
+        messageEl.textContent = 'Authentication successful';
+        messageEl.classList.add('success');
+      } else {
+        messageEl.textContent = 'Authentication failed';
+        messageEl.classList.add('error');
+      }
+    }
+
+    // Hash functions
+    async function hashPassword(password) {
+      const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function hashKeyword(keyword) {
+      const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(keyword));
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function hashSequence(sequence) {
+      const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(sequence));
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Handle login
+    document.getElementById('login-button').addEventListener('click', async () => {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const keyword = document.getElementById('keyword').value.trim();
+      const messageEl = document.getElementById('message');
+
+      const storedUsername = sessionStorage.getItem('username');
+      const storedPasswordHash = sessionStorage.getItem('passwordHash');
+      const storedKeywordHash = sessionStorage.getItem('keywordHash');
+
+      if (username !== storedUsername) {
+        messageEl.textContent = 'Invalid username';
+        messageEl.classList.add('error');
+        return;
+      }
+
+      const passwordHash = await hashPassword(password);
+      if (passwordHash !== storedPasswordHash) {
+        messageEl.textContent = 'Invalid password';
+        messageEl.classList.add('error');
+        return;
+      }
+
+      const keywordHash = await hashKeyword(keyword);
+      if (keywordHash !== storedKeywordHash) {
+        messageEl.textContent = 'Invalid keyword';
+        messageEl.classList.add('error');
+        return;
+      }
+
+      // Proceed to image authentication
+      document.getElementById('grid-container').style.display = 'block';
+      generateGrid(keyword);
+    });
+  </script>
+</body>
+</html>
