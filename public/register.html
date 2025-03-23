@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container" id="register-container">
+    <h1>Register</h1>
+    <form id="register-form" onsubmit="event.preventDefault(); registerUser();">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <input type="text" id="keyword" placeholder="Keyword" required>
+      <button type="button" onclick="generateGridForRegister()">Generate Grid</button>
+      <div id="grid-container" style="display: none;"></div>
+      <button type="submit" id="register-button" class="register-btn" style="display: none;">Register</button>
+    </form>
+    <p id="message"></p>
+    <div class="navigation">
+      <a href="login.html">Already registered? Login here</a>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

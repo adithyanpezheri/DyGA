@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Login</h1>
+    <form id="login-form" onsubmit="event.preventDefault(); loginUser();">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <input type="text" id="keyword" placeholder="Keyword" required>
+      <button type="submit">Login</button>
+    </form>
+    <div id="grid-container" style="display: none;"></div>
+    <p id="message"></p>
+    <div class="navigation">
+      <a href="register.html">Need an account? Register here</a>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
