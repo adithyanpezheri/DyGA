@@ -245,3 +245,4 @@ app.post('/logout', async (req, res) => {
 });
 
 app.listen(3000, () => console.log('Server running on port 3000'));
+// Refresh language stats
